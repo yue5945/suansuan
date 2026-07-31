@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0e0d0b">
+<title>算算 · 六爻占卜</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- 登录页 -->
+<section id="page-login" class="page">
+  <div class="login-wrap">
+    <div class="login-logo">
+      <svg viewBox="0 0 100 100" width="88" height="88" aria-label="太极">
+        <circle cx="50" cy="50" r="48" fill="#e8e2d4"/>
+        <path d="M50 2 A48 48 0 0 1 50 98 A24 24 0 0 1 50 50 A24 24 0 0 0 50 2" fill="#1a1712"/>
+        <circle cx="50" cy="26" r="7" fill="#e8e2d4"/>
+        <circle cx="50" cy="74" r="7" fill="#1a1712"/>
+        <circle cx="50" cy="50" r="48" fill="none" stroke="#c9a227" stroke-width="2"/>
+      </svg>
+    </div>
+    <h1 class="login-title">算 算</h1>
+    <p class="login-sub">六爻占卜 · 问道易康</p>
+    <div class="login-form">
+      <input id="login-username" type="text" inputmode="text" placeholder="用户名 / 手机号" autocomplete="off">
+      <input id="login-password" type="password" placeholder="密码" autocomplete="off">
+      <button id="login-btn" class="btn btn-primary">登 录</button>
+      <p id="login-error" class="login-error"></p>
+    </div>
+  </div>
+</section>
+
+<!-- 主页 · 起卦 -->
+<section id="page-home" class="page">
+  <header class="page-header">
+    <h2>起卦</h2>
+    <div class="header-clock" id="home-clock"></div>
+  </header>
+  <div class="page-body">
+    <div class="mode-switch">
+      <button class="mode-pill active" data-mode="问道">问 道</button>
+      <button class="mode-pill" data-mode="易康">易 康</button>
+    </div>
+    <p class="mode-desc" id="mode-desc">问道模式：周易六爻解卦，兼融诗词国学、佛道经典</p>
+    <textarea id="matter-input" rows="3" placeholder="请默念所占之事，然后写在这里…&#10;例如：近期事业走向如何？"></textarea>
+    <button id="cast-btn" class="btn btn-primary btn-big">开始起卦</button>
+    <p class="cast-hint">心诚则灵 · 一事一占</p>
+  </div>
+</section>
+
+<!-- 结果页 -->
+<section id="page-result" class="page">
+  <header class="page-header">
+    <button class="btn-back" data-go="home">‹ 返回</button>
+    <h2>卦象</h2>
+    <span class="header-spacer"></span>
+  </header>
+  <div class="page-body" id="result-body"></div>
+</section>
+
+<!-- 历史页 -->
+<section id="page-history" class="page">
+  <header class="page-header">
+    <h2>历史记录</h2>
+    <span class="header-spacer"></span>
+  </header>
+  <div class="page-body" id="history-body"></div>
+</section>
+
+<!-- 历史详情页 -->
+<section id="page-history-detail" class="page">
+  <header class="page-header">
+    <button class="btn-back" data-go="history">‹ 返回</button>
+    <h2>卦象详情</h2>
+    <span class="header-spacer"></span>
+  </header>
+  <div class="page-body" id="history-detail-body"></div>
+</section>
+
+<!-- 备注页 -->
+<section id="page-notes" class="page">
+  <header class="page-header">
+    <h2>卦象备注</h2>
+    <span class="header-spacer"></span>
+  </header>
+  <div class="page-body" id="notes-body"></div>
+</section>
+
+<!-- 设置页 -->
+<section id="page-settings" class="page">
+  <header class="page-header">
+    <h2>设置</h2>
+    <span class="header-spacer"></span>
+  </header>
+  <div class="page-body">
+    <div class="settings-group">
+      <h3>DeepSeek API</h3>
+      <label class="settings-label">API Key（用于 AI 解卦）</label>
+      <div class="key-row">
+        <input id="api-key-input" type="password" placeholder="sk-...">
+        <button id="api-key-toggle" class="btn btn-ghost">显示</button>
+      </div>
+      <button id="api-key-save" class="btn btn-secondary">保存 Key</button>
+      <p class="settings-hint" id="api-key-hint"></p>
+    </div>
+    <div class="settings-group">
+      <h3>随喜</h3>
+      <button id="goto-donation" class="btn btn-secondary">随喜支持 ♥</button>
+    </div>
+    <div class="settings-group">
+      <h3>授权管理</h3>
+      <div id="admin-lock">
+        <input id="admin-pwd-input" type="password" placeholder="管理密码（默认 admin123）">
+        <button id="admin-unlock-btn" class="btn btn-secondary">进入授权管理</button>
+        <p class="settings-hint" id="admin-lock-hint"></p>
+      </div>
+      <div id="admin-panel" class="hidden">
+        <div id="admin-user-list"></div>
+        <div class="admin-add">
+          <h4>添加授权用户</h4>
+          <input id="add-username" type="text" placeholder="用户名">
+          <input id="add-password" type="text" placeholder="密码">
+          <input id="add-expire" type="text" placeholder="有效期，如 2027/12/31">
+          <button id="add-user-btn" class="btn btn-secondary">添加</button>
+        </div>
+        <div class="admin-pwd-change">
+          <h4>修改管理密码</h4>
+          <input id="new-admin-pwd" type="password" placeholder="新管理密码（至少4位）">
+          <button id="change-admin-pwd-btn" class="btn btn-secondary">修改</button>
+        </div>
+        <p class="settings-hint" id="admin-panel-hint"></p>
+      </div>
+    </div>
+    <div class="settings-group danger">
+      <h3>数据</h3>
+      <button id="clear-history-btn" class="btn btn-danger">清空历史记录</button>
+      <p class="settings-hint" id="clear-hint"></p>
+    </div>
+    <div class="settings-group">
+      <button id="logout-btn" class="btn btn-ghost">退出登录</button>
+    </div>
+    <p class="app-version">算算 v1.0 · 六爻占卜</p>
+  </div>
+</section>
+
+<!-- 随喜页 -->
+<section id="page-donation" class="page">
+  <header class="page-header">
+    <button class="btn-back" data-go="settings">‹ 返回</button>
+    <h2>随喜支持</h2>
+    <span class="header-spacer"></span>
+  </header>
+  <div class="page-body donation-body">
+    <p class="donation-text">若此应用对您有所帮助<br>欢迎随喜支持，功德无量</p>
+    <div class="qr-frame">
+      <img id="donation-qr" src="https://mathlan.oss-cn-beijing.aliyuncs.com/liuyao.png" alt="收款码">
+      <div id="donation-qr-fallback" class="qr-fallback hidden">收款码加载失败<br>请检查网络后重试</div>
+    </div>
+    <p class="donation-thanks">感谢您的慷慨与支持</p>
+  </div>
+</section>
+
+<!-- 底部导航 -->
+<nav id="bottom-nav" class="hidden">
+  <button data-nav="home" class="nav-item"><span class="nav-icon">☰</span>起卦</button>
+  <button data-nav="history" class="nav-item"><span class="nav-icon">⏱</span>历史</button>
+  <button data-nav="notes" class="nav-item"><span class="nav-icon">✎</span>备注</button>
+  <button data-nav="settings" class="nav-item"><span class="nav-icon">⚙</span>设置</button>
+</nav>
+
+<!-- 弹窗 -->
+<div id="modal-mask" class="hidden">
+  <div id="modal-box">
+    <p id="modal-text"></p>
+    <div class="modal-btns">
+      <button id="modal-cancel" class="btn btn-ghost">取消</button>
+      <button id="modal-ok" class="btn btn-danger">确认</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/lunar.js"></script>
+<script src="js/core.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
