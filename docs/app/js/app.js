@@ -364,6 +364,16 @@
       $("reward-qr-fallback").classList.remove("hidden");
     };
 
+    // 二维码点按放大（App 内无浏览器长按识别菜单）
+    const zoomMask = $("qr-zoom-mask");
+    ["donation-qr", "reward-qr"].forEach((id) => {
+      $(id).onclick = () => {
+        $("qr-zoom-img").src = $(id).src;
+        zoomMask.classList.remove("hidden");
+      };
+    });
+    zoomMask.onclick = () => zoomMask.classList.add("hidden");
+
     window.addEventListener("hashchange", routeFromHash);
   }
 
