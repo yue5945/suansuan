@@ -5,7 +5,7 @@
   const store = LYStore.createStore();
   const $ = (id) => document.getElementById(id);
 
-  const DEV_EMAIL = "304610517@qq.com";   // 开发者邮箱（AI 申请提示统一引用）
+  const DEV_WECHAT = "mathlan3";   // 开发者微信（AI 申请提示统一引用）
 
   // ---------- 状态 ----------
   let currentUser = null;    // 当前登录的账户名（未登录时只能停留在登录页）
@@ -226,7 +226,7 @@
       // 账户 0 等未开通 AI 的账户：提示联系开发者申请
       if (!LYAuth.canUseAI(currentUser, store)) {
         container.querySelector(".ai-area").innerHTML =
-          `<div class="ai-result">当前账户未开通 AI 解卦<br>请联系开发者邮箱 ${DEV_EMAIL} 申请账户</div>`;
+          `<div class="ai-result">当前账户未开通 AI 解卦<br>请联系开发者微信 ${DEV_WECHAT} 申请开通</div>`;
         return;
       }
       runAnalysis(container, record, benEntry, zhiEntry);
@@ -401,6 +401,9 @@
       });
 
     $("cast-btn").onclick = performDivination;
+
+    // 起卦页底部：退出当前账户，返回登录页（账户密码仍自动填回）
+    $("logout-btn").onclick = () => { currentUser = null; showPage("login"); };
 
     document.querySelectorAll(".nav-item").forEach((b) =>
       b.onclick = () => showPage(b.dataset.nav));
