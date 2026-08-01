@@ -42,6 +42,10 @@
   }
   .dl-btn:active { opacity: .85; }
   .dl-note { margin-top: 14px; font-size: 13px; color: var(--text-dim); }
+  .ios-box { margin-top: 32px; }
+  .ios-divider { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; color: var(--text-dim); font-size: 13px; letter-spacing: 2px; }
+  .ios-divider::before, .ios-divider::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+  .dl-btn-ios { background: none; border: 1px solid var(--gold); color: var(--gold); box-shadow: none; }
   .qr-box { margin-top: 32px; }
   .qr-box img { width: 150px; height: 150px; border-radius: 10px; background: #fff; padding: 6px; }
   .qr-box p { font-size: 13px; color: var(--text-dim); margin-top: 8px; }
@@ -111,6 +115,11 @@
   </div>
   <a class="dl-btn" href="app-debug.apk">下载安卓版</a>
   <p class="dl-note">Android 7.0 及以上 · 安装包约 1 MB<br>微信内打开请点右上角「···」选择「在浏览器打开」再下载</p>
+  <div class="ios-box">
+    <div class="ios-divider"><span>iPhone / iPad 用户</span></div>
+    <a class="dl-btn dl-btn-ios" href="app/">打开网页版</a>
+    <p class="dl-note">用 <strong>Safari</strong> 打开网页版 → 点底部分享按钮 →「添加到主屏幕」<br>桌面即出现太极图标，与 App 体验一致</p>
+  </div>
   <div class="qr-box">
     <img src="qr-site.png" alt="手机扫码下载">
     <p>手机扫码直达本页</p>
