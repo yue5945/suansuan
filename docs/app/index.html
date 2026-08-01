@@ -15,6 +15,21 @@
 </head>
 <body>
 
+<!-- 登录页 -->
+<section id="page-login" class="page active">
+  <div class="login-wrap">
+    <img class="login-logo" src="icon-512.png" width="96" height="96" alt="太极" style="border-radius: 50%;">
+    <h1 class="login-title">算 算</h1>
+    <p class="login-sub">口袋里的周易 · 六爻排盘</p>
+    <div class="login-form">
+      <input id="login-username" type="text" placeholder="账户名" autocomplete="username">
+      <input id="login-password" type="password" placeholder="密码" autocomplete="current-password">
+      <button id="login-btn" class="btn btn-primary btn-big">登 录</button>
+      <p class="login-error" id="login-error"></p>
+    </div>
+  </div>
+</section>
+
 <!-- 主页 · 起卦 -->
 <section id="page-home" class="page">
   <header class="page-header">
@@ -84,13 +99,6 @@
   <div class="page-body donation-body">
     <p class="donation-text">若此应用对您有所帮助<br>欢迎随喜支持，功德无量</p>
     <div class="qr-row">
-      <div class="qr-item">
-        <div class="qr-frame">
-          <img id="reward-qr" src="reward.png" alt="赞赏码">
-          <div id="reward-qr-fallback" class="qr-fallback hidden">赞赏码加载失败<br>请检查网络后重试</div>
-        </div>
-        <p class="qr-label">赞赏码 · 长按识别</p>
-      </div>
       <div class="qr-item">
         <div class="qr-frame">
           <img id="donation-qr" src="payment.png" alt="收款码">
