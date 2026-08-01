@@ -88,11 +88,13 @@
   // ---------- 授权用户 ----------
   function getSpecialUsers(store) {
     let users = store.getJSON("special_users", null);
-    if (!Array.isArray(users) || users.length === 0) {
-      users = LY_DATA.DEFAULT_SPECIAL_USERS.map((u) => ({ ...u }));
-      store.setJSON("special_users", users);
-    }
-    return users;
+    if (!Array.isArray(users)) users = [];
+    // 代码中的默认账户覆盖同名存储项：开发者改 data.js 即生效（如账户 0 的期限与 AI 权限）
+    const extras = users.filter((stored) =>
+      !LY_DATA.DEFAULT_SPECIAL_USERS.some((d) => d.username === stored.username));
+    const merged = LY_DATA.DEFAULT_SPECIAL_USERS.map((u) => ({ ...u })).concat(extras);
+    store.setJSON("special_users", merged);
+    return merged;
   }
 
   function saveSpecialUsers(store, users) {
@@ -176,10 +178,17 @@
     store.setJSON("admin_pwd", String(newPwd));
   }
 
+  // ---------- AI 解卦权限：账户条目中 allow_ai:false 则禁用（如账户 0） ----------
+  function canUseAI(username, store) {
+    const u = getSpecialUsers(store).find((x) => x.username === String(username || "").trim());
+    if (!u) return true;   // 手机号生成的账户默认可用
+    return u.allow_ai !== false;
+  }
+
   const api = {
     generatePassword, getSpecialUsers, saveSpecialUsers, checkDateValidity,
     validateLogin, addSpecialUser, updateSpecialUser, deleteSpecialUser,
-    verifyAdminPassword, setAdminPassword, parseExpireDate,
+    verifyAdminPassword, setAdminPassword, parseExpireDate, canUseAI,
     _sha256Bytes: sha256Bytes,
   };
   if (typeof module !== "undefined") module.exports = api;
