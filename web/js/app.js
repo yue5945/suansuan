@@ -1,11 +1,14 @@
-// 算算 · 页面路由与渲染（免登录版）
+// 算算 · 页面路由与渲染（登录版：每次打开先登录；账户 0 不可用 AI 解卦）
 (function () {
   "use strict";
 
   const store = LYStore.createStore();
   const $ = (id) => document.getElementById(id);
 
+  const DEV_EMAIL = "304610517@qq.com";   // 开发者邮箱（AI 申请提示统一引用）
+
   // ---------- 状态 ----------
+  let currentUser = null;    // 当前登录的账户名（未登录时只能停留在登录页）
   let currentMode = "问道";
   let currentRecord = null;   // 当前查看的卦记录
   let clockTimer = null;
@@ -19,9 +22,11 @@
   const NAV_PAGES = ["home", "history", "notes", "donation"];
 
   function showPage(name) {
+    if (!currentUser && name !== "login") name = "login";  // 未登录一律先到登录页
     document.querySelectorAll(".page").forEach((p) => p.classList.remove("active"));
     const page = $("page-" + name);
     if (page) page.classList.add("active");
+    $("bottom-nav").classList.toggle("hidden", name === "login");
     document.querySelectorAll(".nav-item").forEach((b) =>
       b.classList.toggle("active", b.dataset.nav === name));
     if (name === "home") startClock(); else stopClock();
@@ -34,6 +39,46 @@
   function routeFromHash() {
     const name = (location.hash || "#/home").replace("#/", "") || "home";
     showPage(document.getElementById("page-" + name) ? name : "home");
+  }
+
+  // ---------- 登录 ----------
+  function initLogin() {
+    // 默认账户 0/0；上次输入的账户密码自动填回
+    const saved = store.getJSON("login_creds", null) || { username: "0", password: "0" };
+    $("login-username").value = saved.username || "0";
+    $("login-password").value = saved.password || "0";
+
+    // 每次输入后自动保存（任何账户都保存）
+    const saveCreds = () => store.setJSON("login_creds", {
+      username: $("login-username").value,
+      password: $("login-password").value,
+    });
+    $("login-username").addEventListener("input", saveCreds);
+    $("login-password").addEventListener("input", saveCreds);
+
+    const tryLogin = async () => {
+      const u = $("login-username").value.trim();
+      const p = $("login-password").value.trim();
+      saveCreds();
+      $("login-error").textContent = "";
+      $("login-btn").disabled = true;
+      try {
+        if (await LYAuth.validateLogin(u, p, store)) {
+          currentUser = u;
+          showPage("home");
+        } else {
+          $("login-error").textContent = "账户名或密码错误，或账户已过有效期";
+        }
+      } catch (e) {
+        $("login-error").textContent = "登录异常，请重试";
+      } finally {
+        $("login-btn").disabled = false;
+      }
+    };
+    $("login-btn").onclick = tryLogin;
+    $("login-password").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") tryLogin();
+    });
   }
 
   // ---------- 弹窗 ----------
@@ -177,8 +222,15 @@
         `<div class="ai-result">${escapeHtml(record.ai_analysis)}</div>`;
     }
 
-    container.querySelector(".ai-btn").onclick = () =>
+    container.querySelector(".ai-btn").onclick = () => {
+      // 账户 0 等未开通 AI 的账户：提示联系开发者申请
+      if (!LYAuth.canUseAI(currentUser, store)) {
+        container.querySelector(".ai-area").innerHTML =
+          `<div class="ai-result">当前账户未开通 AI 解卦<br>请联系开发者邮箱 ${DEV_EMAIL} 申请账户</div>`;
+        return;
+      }
       runAnalysis(container, record, benEntry, zhiEntry);
+    };
     container.querySelector(".note-btn").onclick = () =>
       showNoteEditor(container, record, benEntry.name);
   }
@@ -359,25 +411,26 @@
       $("donation-qr").classList.add("hidden");
       $("donation-qr-fallback").classList.remove("hidden");
     };
-    $("reward-qr").onerror = () => {
-      $("reward-qr").classList.add("hidden");
-      $("reward-qr-fallback").classList.remove("hidden");
-    };
 
-    // 二维码点按放大（App 内无浏览器长按识别菜单）
+    // 收款码点按/长按放大（App 内无浏览器长按识别菜单，放大后截屏再用微信识别）
     const zoomMask = $("qr-zoom-mask");
-    ["donation-qr", "reward-qr"].forEach((id) => {
-      $(id).onclick = () => {
-        $("qr-zoom-img").src = $(id).src;
-        zoomMask.classList.remove("hidden");
-      };
+    const openZoom = (src) => {
+      $("qr-zoom-img").src = src;
+      zoomMask.classList.remove("hidden");
+    };
+    const qr = $("donation-qr");
+    qr.onclick = () => openZoom(qr.src);
+    qr.addEventListener("contextmenu", (e) => {  // 长按触发
+      e.preventDefault();
+      openZoom(qr.src);
     });
     zoomMask.onclick = () => zoomMask.classList.add("hidden");
 
     window.addEventListener("hashchange", routeFromHash);
   }
 
-  // ---------- 启动（免登录，直接进入） ----------
+  // ---------- 启动（每次打开先登录，账户密码已自动填好，点「登录」即可） ----------
   bindEvents();
-  routeFromHash();
+  initLogin();
+  showPage("login");
 })();

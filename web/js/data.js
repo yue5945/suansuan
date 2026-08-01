@@ -1350,17 +1350,18 @@ var LY_DATA = {
   {
    "username": "0",
    "password": "0",
-   "expire_date": "2026/12/31"
+   "expire_date": "9999/12/31",
+   "allow_ai": false
   },
   {
    "username": "admin",
    "password": "admin123",
-   "expire_date": "2025/10/26"
+   "expire_date": "9999/12/31"
   },
   {
    "username": "test",
    "password": "test456",
-   "expire_date": "2025/10/26"
+   "expire_date": "9999/12/31"
   }
  ],
  "DEFAULT_API_KEY": "sk-5861282c4a9b443398947e9dc3a91547",
