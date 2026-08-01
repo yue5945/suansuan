@@ -5,6 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0e0d0b">
 <title>算算 · 六爻占卜</title>
+<link rel="manifest" href="manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="算算">
+<link rel="apple-touch-icon" href="icon-180.png">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -20,8 +26,8 @@
       <button class="mode-pill active" data-mode="问道">问 道</button>
       <button class="mode-pill" data-mode="易康">易 康</button>
     </div>
-    <p class="mode-desc" id="mode-desc">问道模式：周易六爻解卦，兼融诗词国学、佛道经典</p>
-    <textarea id="matter-input" rows="3" placeholder="请默念所占之事，然后写在这里…&#10;例如：近期事业走向如何？"></textarea>
+    <p class="mode-desc" id="mode-desc">问道模式：周易解卦，引经据典</p>
+    <textarea id="matter-input" rows="3" placeholder="请默念所占之事，然后写在这里…"></textarea>
     <button id="cast-btn" class="btn btn-primary btn-big">开始起卦</button>
     <p class="cast-hint">心诚则灵 · 一事一占</p>
     <div class="dev-footer">
@@ -77,9 +83,21 @@
   </header>
   <div class="page-body donation-body">
     <p class="donation-text">若此应用对您有所帮助<br>欢迎随喜支持，功德无量</p>
-    <div class="qr-frame">
-      <img id="donation-qr" src="https://mathlan.oss-cn-beijing.aliyuncs.com/liuyao.png" alt="收款码">
-      <div id="donation-qr-fallback" class="qr-fallback hidden">收款码加载失败<br>请检查网络后重试</div>
+    <div class="qr-row">
+      <div class="qr-item">
+        <div class="qr-frame">
+          <img id="reward-qr" src="reward.png" alt="赞赏码">
+          <div id="reward-qr-fallback" class="qr-fallback hidden">赞赏码加载失败<br>请检查网络后重试</div>
+        </div>
+        <p class="qr-label">赞赏码 · 长按识别</p>
+      </div>
+      <div class="qr-item">
+        <div class="qr-frame">
+          <img id="donation-qr" src="payment.png" alt="收款码">
+          <div id="donation-qr-fallback" class="qr-fallback hidden">收款码加载失败<br>请检查网络后重试</div>
+        </div>
+        <p class="qr-label">收款码 · 扫码支付</p>
+      </div>
     </div>
     <p class="donation-thanks">感谢您的慷慨与支持</p>
   </div>
