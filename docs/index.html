@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>算算 · 免费六爻排盘工具</title>
+<meta name="description" content="算算：口袋里的周易。免费无广告的六爻排盘工具，AI 辅助解读，问道易康双模式。">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #0e0d0b; --bg-card: #1a1712; --bg-soft: #221e17;
+    --text: #e8e2d4; --text-dim: #9a917e;
+    --gold: #c9a227; --cinnabar: #c0392b; --line: #2e2a21;
+  }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+    line-height: 1.8;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 0 20px; }
+
+  /* 头部 */
+  .hero { text-align: center; padding: 72px 20px 48px; }
+  .hero svg { margin-bottom: 20px; }
+  .hero h1 {
+    font-size: 44px; letter-spacing: 18px; text-indent: 18px;
+    color: var(--gold); font-weight: 600; margin-bottom: 12px;
+  }
+  .hero .tagline { color: var(--text-dim); font-size: 16px; letter-spacing: 3px; margin-bottom: 36px; }
+  .badges { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-bottom: 40px; }
+  .badge {
+    font-size: 13px; color: var(--gold);
+    border: 1px solid rgba(201,162,39,.4); border-radius: 999px;
+    padding: 5px 14px; letter-spacing: 1px;
+  }
+  .dl-btn {
+    display: inline-block; text-decoration: none;
+    background: linear-gradient(135deg, #a5231a, var(--cinnabar));
+    color: #f5ecd9; font-size: 18px; font-weight: 600; letter-spacing: 3px;
+    padding: 16px 52px; border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(192,57,43,.3);
+  }
+  .dl-btn:active { opacity: .85; }
+  .dl-note { margin-top: 14px; font-size: 13px; color: var(--text-dim); }
+  .qr-box { margin-top: 32px; }
+  .qr-box img { width: 150px; height: 150px; border-radius: 10px; background: #fff; padding: 6px; }
+  .qr-box p { font-size: 13px; color: var(--text-dim); margin-top: 8px; }
+
+  /* 分区 */
+  section { padding: 40px 0; border-top: 1px solid var(--line); }
+  h2 {
+    font-size: 20px; color: var(--gold); letter-spacing: 4px;
+    text-align: center; margin-bottom: 28px; font-weight: 600;
+  }
+
+  /* 特性 */
+  .feat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .feat {
+    background: var(--bg-card); border: 1px solid var(--line);
+    border-radius: 12px; padding: 18px;
+  }
+  .feat h3 { font-size: 16px; color: var(--text); margin-bottom: 6px; }
+  .feat h3 .dot { color: var(--cinnabar); margin-right: 6px; }
+  .feat p { font-size: 13px; color: var(--text-dim); line-height: 1.7; }
+
+  /* 安装步骤 */
+  .steps { counter-reset: step; }
+  .step {
+    display: flex; gap: 14px; margin-bottom: 16px;
+    background: var(--bg-card); border: 1px solid var(--line);
+    border-radius: 12px; padding: 16px;
+  }
+  .step-num {
+    flex-shrink: 0; width: 30px; height: 30px; border-radius: 50%;
+    background: rgba(201,162,39,.15); color: var(--gold);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 600;
+  }
+  .step p { font-size: 14px; color: var(--text); }
+  .step .warn { color: var(--cinnabar); }
+
+  /* 随喜 */
+  .donate { text-align: center; }
+  .donate img { width: 220px; height: 220px; border-radius: 12px; background: #fff; padding: 8px; }
+  .donate p { font-size: 14px; color: var(--text-dim); margin-top: 14px; }
+
+  /* 页脚 */
+  footer {
+    border-top: 1px solid var(--line); padding: 28px 0 40px;
+    text-align: center; font-size: 13px; color: var(--text-dim);
+  }
+  footer .fline { width: 56px; height: 1px; background: var(--gold); opacity: .5; margin: 0 auto 12px; }
+
+  @media (max-width: 520px) {
+    .hero h1 { font-size: 34px; letter-spacing: 12px; text-indent: 12px; }
+    .feat-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <svg viewBox="0 0 100 100" width="96" height="96" aria-label="太极">
+    <circle cx="50" cy="50" r="48" fill="#e8e2d4"/>
+    <path d="M50 2 A48 48 0 0 1 50 98 A24 24 0 0 1 50 50 A24 24 0 0 0 50 2" fill="#1a1712"/>
+    <circle cx="50" cy="26" r="7" fill="#e8e2d4"/>
+    <circle cx="50" cy="74" r="7" fill="#1a1712"/>
+    <circle cx="50" cy="50" r="48" fill="none" stroke="#c9a227" stroke-width="2"/>
+  </svg>
+  <h1>算 算</h1>
+  <p class="tagline">口袋里的周易 · 免费六爻排盘工具</p>
+  <div class="badges">
+    <span class="badge">完全免费</span>
+    <span class="badge">无需注册</span>
+    <span class="badge">无广告</span>
+    <span class="badge">AI 辅助解读</span>
+  </div>
+  <a class="dl-btn" href="app-debug.apk">下载安卓版</a>
+  <p class="dl-note">Android 7.0 及以上 · 安装包约 1 MB<br>微信内打开请点右上角「···」选择「在浏览器打开」再下载</p>
+  <div class="qr-box">
+    <img src="qr-site.png" alt="手机扫码下载">
+    <p>手机扫码直达本页</p>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <section>
+    <h2>为 何 算 算</h2>
+    <div class="feat-grid">
+      <div class="feat">
+        <h3><span class="dot">◆</span>专业排盘</h3>
+        <p>六十四卦完整数据，六亲、六神、世应、纳甲地支、变爻一应俱全，本卦之卦同屏对照。</p>
+      </div>
+      <div class="feat">
+        <h3><span class="dot">◆</span>AI 辅助解读</h3>
+        <p>接入 DeepSeek 大模型，问道、易康双模式，解读自动存档，随时回看再分析。</p>
+      </div>
+      <div class="feat">
+        <h3><span class="dot">◆</span>历史与手记</h3>
+        <p>每次起卦自动保存，可为每卦写下心得备注，是你的随身断卦手记本。</p>
+      </div>
+      <div class="feat">
+        <h3><span class="dot">◆</span>干净纯粹</h3>
+        <p>无登录、无广告、不收集任何信息，打开即用。数据只存在你自己的手机里。</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>安 装 教 程</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <p>点上方「下载安卓版」，或手机扫码进入本页下载 APK 安装包。</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <p>下载完成后点开安装包。若提示「禁止安装未知来源应用」，按提示<strong>允许本次安装</strong>即可（本应用不上架商店，此为正常提示）。</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <p>桌面出现太极图标的「算算」，打开即可起卦，<strong>无需注册登录</strong>。</p>
+      </div>
+      <div class="step">
+        <div class="step-num">!</div>
+        <p><span class="warn">微信传输注意</span>：若通过微信接收 APK，文件名会被改成「.apk.1」，请在手机「文件管理」中找到它，<strong>重命名删掉末尾的 .1</strong> 再安装。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="donate">
+    <h2>随 喜 支 持</h2>
+    <img src="https://mathlan.oss-cn-beijing.aliyuncs.com/liuyao.png" alt="随喜收款码" onerror="this.style.display='none'">
+    <p>若这款小工具对你有所帮助，欢迎随喜支持，功德无量。</p>
+  </section>
+
+</div>
+
+<footer>
+  <div class="fline"></div>
+  <p>开发者邮箱：304610517@qq.com</p>
+  <p style="margin-top:6px">算算 · 周易文化学习工具</p>
+</footer>
+
+</body>
+</html>
