@@ -11,8 +11,8 @@
   let clockTimer = null;
 
   const MODE_DESC = {
-    "问道": "问道模式：周易六爻解卦，兼融诗词国学、佛道经典",
-    "易康": "易康模式：六爻参合中医西医、心理营养、运动康复",
+    "问道": "问道模式：周易解卦，引经据典",
+    "易康": "易康模式：周易解卦，兼参身心调养",
   };
 
   // ---------- 路由 ----------
@@ -77,6 +77,7 @@
     store.setJSON("history", history);
 
     currentRecord = record;
+    $("matter-input").value = "";  // 起卦后自动清空输入框
     renderResult($("result-body"), record);
     showPage("result");
   }
@@ -357,6 +358,10 @@
     $("donation-qr").onerror = () => {
       $("donation-qr").classList.add("hidden");
       $("donation-qr-fallback").classList.remove("hidden");
+    };
+    $("reward-qr").onerror = () => {
+      $("reward-qr").classList.add("hidden");
+      $("reward-qr-fallback").classList.remove("hidden");
     };
 
     window.addEventListener("hashchange", routeFromHash);

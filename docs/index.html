@@ -85,7 +85,9 @@
 
   /* 随喜 */
   .donate { text-align: center; }
-  .donate img { width: 220px; height: 220px; border-radius: 12px; background: #fff; padding: 8px; }
+  .donate-row { display: flex; gap: 20px; justify-content: center; align-items: flex-start; flex-wrap: wrap; }
+  .donate-item img { width: 180px; height: 180px; border-radius: 12px; background: #fff; padding: 8px; }
+  .donate-label { font-size: 13px; color: var(--text-dim); margin-top: 8px; letter-spacing: 2px; }
   .donate p { font-size: 14px; color: var(--text-dim); margin-top: 14px; }
 
   /* 页脚 */
@@ -116,10 +118,11 @@
   <a class="dl-btn" href="app-debug.apk">下载安卓版</a>
   <p class="dl-note">Android 7.0 及以上 · 安装包约 1 MB<br>微信内打开请点右上角「···」选择「在浏览器打开」再下载</p>
   <div class="ios-box">
-    <div class="ios-divider"><span>iPhone / iPad 用户</span></div>
+    <div class="ios-divider"><span>免安装网页版 · iPhone / Android 通用</span></div>
     <a class="dl-btn dl-btn-ios" href="app/">打开网页版</a>
-    <p class="dl-note">用 <strong>Safari</strong> 打开网页版 → 点底部分享按钮 →「添加到主屏幕」<br>桌面即出现太极图标，与 App 体验一致</p>
+    <p class="dl-note">iPhone 用 <strong>Safari</strong>、Android 用 <strong>Chrome</strong> 打开 → 分享/菜单 →「添加到主屏幕」<br>桌面即出现太极图标，与 App 体验一致；Android 不想装 APK 也可直接用网页版</p>
   </div>
+  <p class="dl-note" style="margin-top: 22px;">网络较慢时，下载或打开网页版可多尝试几次<br>若实在无法使用，可邮件联系开发者 <strong>304610517@qq.com</strong> 申请免费使用</p>
   <div class="qr-box">
     <img src="qr-site.png" alt="手机扫码下载">
     <p>手机扫码直达本页</p>
@@ -174,7 +177,16 @@
 
   <section class="donate">
     <h2>随 喜 支 持</h2>
-    <img src="https://mathlan.oss-cn-beijing.aliyuncs.com/liuyao.png" alt="随喜收款码" onerror="this.style.display='none'">
+    <div class="donate-row">
+      <div class="donate-item">
+        <img src="reward.png" alt="赞赏码">
+        <p class="donate-label">赞赏码 · 长按识别</p>
+      </div>
+      <div class="donate-item">
+        <img src="payment.png" alt="收款码">
+        <p class="donate-label">收款码 · 扫码支付</p>
+      </div>
+    </div>
     <p>若这款小工具对你有所帮助，欢迎随喜支持，功德无量。</p>
   </section>
 
