@@ -1,0 +1,298 @@
+/* 算算 · 深色卦盘风格 */
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+:root {
+  --bg: #0e0d0b;
+  --bg-card: #1a1712;
+  --bg-input: #221e17;
+  --text: #e8e2d4;
+  --text-dim: #9a917e;
+  --gold: #c9a227;
+  --cinnabar: #c0392b;
+  --line: #2e2a21;
+}
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+  font-size: 16px;
+  overscroll-behavior: none;
+}
+
+.hidden { display: none !important; }
+
+/* ---------- 页面框架 ---------- */
+.page {
+  display: none;
+  min-height: 100vh;
+  min-height: 100dvh;
+  flex-direction: column;
+  padding-bottom: calc(72px + env(safe-area-inset-bottom));
+}
+.page.active { display: flex; }
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: calc(14px + env(safe-area-inset-top)) 18px 14px;
+  border-bottom: 1px solid var(--line);
+  background: var(--bg);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.page-header h2 {
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  color: var(--gold);
+}
+.header-spacer { width: 56px; }
+.header-clock { font-size: 13px; color: var(--text-dim); font-variant-numeric: tabular-nums; }
+
+.page-body { flex: 1; padding: 18px; }
+
+.btn-back {
+  background: none; border: none; color: var(--gold);
+  font-size: 16px; padding: 4px 8px; width: 56px; text-align: left;
+  font-family: inherit;
+}
+
+/* ---------- 按钮 / 输入 ---------- */
+.btn {
+  display: block; width: 100%;
+  border: none; border-radius: 10px;
+  padding: 14px; font-size: 16px; font-family: inherit;
+  letter-spacing: 1px; cursor: pointer;
+}
+.btn:active { opacity: 0.82; }
+.btn-primary {
+  background: linear-gradient(135deg, #a5231a, var(--cinnabar));
+  color: #f5ecd9; font-weight: 600;
+  box-shadow: 0 2px 10px rgba(192, 57, 43, 0.25);
+}
+.btn-big { padding: 17px; font-size: 18px; letter-spacing: 4px; margin-top: 20px; }
+.btn-secondary {
+  background: var(--bg-input); color: var(--gold);
+  border: 1px solid var(--line); margin-top: 10px;
+}
+.btn-ghost { background: none; color: var(--text-dim); border: 1px solid var(--line); margin-top: 10px; }
+.btn-danger {
+  background: none; color: var(--cinnabar);
+  border: 1px solid var(--cinnabar);
+}
+
+input, textarea {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--text);
+  padding: 14px;
+  font-size: 16px;
+  font-family: inherit;
+  outline: none;
+  margin-bottom: 12px;
+}
+input:focus, textarea:focus { border-color: var(--gold); }
+textarea { resize: none; line-height: 1.7; }
+
+/* ---------- 登录页 ---------- */
+.login-wrap {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 32px; max-width: 420px; margin: 0 auto; width: 100%;
+}
+.login-logo { margin-bottom: 18px; }
+.login-title {
+  font-size: 34px; letter-spacing: 14px; text-indent: 14px;
+  color: var(--gold); font-weight: 600; margin-bottom: 8px;
+}
+.login-sub { color: var(--text-dim); font-size: 14px; letter-spacing: 3px; margin-bottom: 42px; }
+.login-form { width: 100%; }
+.login-error { color: var(--cinnabar); font-size: 14px; text-align: center; margin-top: 14px; min-height: 20px; }
+
+/* ---------- 开发者页脚 ---------- */
+.dev-footer { margin-top: 48px; text-align: center; }
+.dev-footer-line {
+  width: 56px; height: 1px; background: var(--gold);
+  opacity: 0.5; margin: 0 auto 12px;
+}
+.dev-footer p { color: var(--text-dim); font-size: 13px; letter-spacing: 1px; }
+
+/* ---------- 主页 ---------- */
+.mode-switch { display: flex; gap: 12px; margin-bottom: 10px; }
+.mode-pill {
+  flex: 1; padding: 14px; border-radius: 999px;
+  background: var(--bg-input); border: 1px solid var(--line);
+  color: var(--text-dim); font-size: 17px; letter-spacing: 4px;
+  font-family: inherit;
+}
+.mode-pill.active {
+  background: rgba(201, 162, 39, 0.12);
+  border-color: var(--gold); color: var(--gold); font-weight: 600;
+}
+.mode-desc { font-size: 13px; color: var(--text-dim); margin-bottom: 16px; line-height: 1.6; }
+.cast-hint { text-align: center; color: var(--text-dim); font-size: 13px; margin-top: 16px; letter-spacing: 2px; }
+
+/* ---------- 卦象排盘 ---------- */
+.divi-meta {
+  background: var(--bg-card); border: 1px solid var(--line);
+  border-radius: 12px; padding: 14px 16px; margin-bottom: 16px;
+  font-size: 14px; line-height: 2; color: var(--text-dim);
+}
+.divi-meta b { color: var(--text); font-weight: 600; }
+.divi-matter { color: var(--gold); }
+
+.hex-panel {
+  background: var(--bg-card); border: 1px solid var(--line);
+  border-radius: 12px; padding: 16px; margin-bottom: 16px;
+}
+.hex-panel.changed { border-color: rgba(192, 57, 43, 0.4); }
+.hex-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 6px; }
+.hex-tag { font-size: 13px; color: var(--text-dim); letter-spacing: 2px; }
+.hex-tag.changed-tag { color: var(--cinnabar); }
+.hex-name { font-size: 22px; font-weight: 600; color: var(--gold); }
+.hex-judgment { font-size: 14px; color: var(--text-dim); margin-bottom: 4px; }
+.hex-gong { font-size: 13px; color: var(--text-dim); margin-bottom: 14px; }
+
+.yao-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 7px 0; border-bottom: 1px dashed rgba(46, 42, 33, 0.7);
+}
+.yao-row:last-child { border-bottom: none; }
+.yao-fig { width: 92px; flex-shrink: 0; display: flex; align-items: center; gap: 6px; }
+.yao-bar { height: 12px; border-radius: 2px; background: var(--text); flex: 1; min-width: 0; }
+.yao-mark { color: var(--cinnabar); font-size: 15px; width: 16px; text-align: center; font-weight: 700; }
+.yao-info { flex: 1; font-size: 13px; line-height: 1.7; }
+.yao-line1 { color: var(--text); }
+.yao-line1 .lq { color: var(--gold); }
+.yao-line2 { color: var(--text-dim); font-size: 12px; }
+.yao-pos { color: var(--text-dim); font-size: 12px; width: 34px; flex-shrink: 0; text-align: right; }
+.shi-ying-badge {
+  display: inline-block; font-size: 11px; color: var(--bg);
+  background: var(--gold); border-radius: 4px; padding: 0 5px;
+  margin-left: 6px; line-height: 18px;
+}
+.shi-ying-badge.ying { background: none; color: var(--gold); border: 1px solid var(--gold); }
+
+.hex-yaoci { margin-top: 12px; font-size: 13px; color: var(--text-dim); line-height: 1.9; }
+.hex-yaoci p b { color: var(--text); font-weight: 500; }
+
+.note-block {
+  margin-top: 12px; padding-top: 12px;
+  border-top: 1px solid var(--line);
+  font-size: 13px; color: var(--text-dim); line-height: 1.8;
+}
+.note-block b { color: var(--gold); }
+
+.result-actions { margin: 8px 0 20px; }
+.ai-result {
+  background: var(--bg-card); border: 1px solid rgba(201, 162, 39, 0.35);
+  border-radius: 12px; padding: 16px; margin-bottom: 16px;
+  font-size: 15px; line-height: 2; white-space: pre-wrap; word-break: break-word;
+}
+.ai-result .ai-cursor { color: var(--gold); }
+.ai-loading { text-align: center; color: var(--text-dim); padding: 20px; font-size: 14px; letter-spacing: 1px; }
+
+/* ---------- 历史 ---------- */
+.history-item {
+  background: var(--bg-card); border: 1px solid var(--line);
+  border-radius: 12px; padding: 14px 16px; margin-bottom: 12px;
+}
+.history-item .hi-top { display: flex; justify-content: space-between; align-items: baseline; }
+.history-item .hi-hex { font-size: 17px; color: var(--gold); font-weight: 600; }
+.history-item .hi-time { font-size: 12px; color: var(--text-dim); font-variant-numeric: tabular-nums; }
+.history-item .hi-matter { font-size: 14px; color: var(--text); margin-top: 6px; }
+.history-item .hi-mode { font-size: 12px; color: var(--text-dim); margin-top: 4px; }
+.history-item .hi-ai { color: var(--gold); }
+.history-item .hi-actions { display: flex; gap: 10px; margin-top: 10px; }
+.history-item .hi-actions .btn { padding: 8px; font-size: 13px; margin: 0; }
+
+.empty-state { text-align: center; color: var(--text-dim); padding: 60px 20px; font-size: 14px; line-height: 2; }
+
+/* ---------- 备注 ---------- */
+.note-item {
+  background: var(--bg-card); border: 1px solid var(--line);
+  border-radius: 12px; padding: 14px 16px; margin-bottom: 12px;
+}
+.note-item .ni-name { font-size: 16px; color: var(--gold); font-weight: 600; margin-bottom: 6px; }
+.note-item .ni-text { font-size: 14px; color: var(--text); line-height: 1.8; white-space: pre-wrap; }
+.note-item .ni-actions { display: flex; gap: 10px; margin-top: 10px; }
+.note-item .ni-actions .btn { padding: 8px; font-size: 13px; margin: 0; }
+
+/* ---------- 设置 ---------- */
+.settings-group {
+  background: var(--bg-card); border: 1px solid var(--line);
+  border-radius: 12px; padding: 16px; margin-bottom: 14px;
+}
+.settings-group h3 { font-size: 15px; color: var(--gold); margin-bottom: 12px; letter-spacing: 1px; }
+.settings-group h4 { font-size: 14px; color: var(--text); margin: 14px 0 10px; }
+.settings-label { display: block; font-size: 13px; color: var(--text-dim); margin-bottom: 8px; }
+.settings-hint { font-size: 13px; color: var(--text-dim); margin-top: 10px; min-height: 18px; line-height: 1.6; }
+.settings-hint.ok { color: #6a8f5f; }
+.settings-hint.err { color: var(--cinnabar); }
+.key-row { display: flex; gap: 10px; }
+.key-row input { flex: 1; }
+.key-row .btn { width: 76px; padding: 0; margin: 0 0 12px; }
+.admin-add, .admin-pwd-change { border-top: 1px dashed var(--line); margin-top: 14px; padding-top: 4px; }
+.admin-user-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 0; border-bottom: 1px dashed var(--line); font-size: 14px;
+}
+.admin-user-row .au-info { flex: 1; line-height: 1.6; }
+.admin-user-row .au-name { color: var(--text); }
+.admin-user-row .au-exp { font-size: 12px; color: var(--text-dim); }
+.admin-user-row .au-exp.expired { color: var(--cinnabar); }
+.admin-user-row .btn { width: 64px; padding: 7px; font-size: 12px; margin: 0; }
+.app-version { text-align: center; color: var(--text-dim); font-size: 12px; margin-top: 10px; letter-spacing: 1px; }
+
+/* ---------- 随喜 ---------- */
+.donation-body { display: flex; flex-direction: column; align-items: center; padding-top: 36px; }
+.donation-text { text-align: center; font-size: 16px; line-height: 2.2; color: var(--text); letter-spacing: 2px; margin-bottom: 28px; }
+.qr-frame {
+  width: 260px; height: 260px; border-radius: 16px;
+  border: 1px solid var(--gold); padding: 10px; background: #fff;
+  display: flex; align-items: center; justify-content: center;
+}
+.qr-frame img { width: 100%; height: 100%; object-fit: contain; border-radius: 8px; }
+.qr-fallback { color: #666; text-align: center; font-size: 14px; line-height: 2; }
+.donation-thanks { margin-top: 28px; color: var(--gold); font-size: 15px; letter-spacing: 3px; }
+
+/* ---------- 底部导航 ---------- */
+#bottom-nav {
+  position: fixed; left: 0; right: 0; bottom: 0;
+  display: flex; background: rgba(14, 13, 11, 0.96);
+  border-top: 1px solid var(--line);
+  padding-bottom: env(safe-area-inset-bottom);
+  z-index: 20;
+}
+.nav-item {
+  flex: 1; background: none; border: none;
+  color: var(--text-dim); font-size: 12px;
+  padding: 10px 0 8px; font-family: inherit;
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+}
+.nav-item .nav-icon { font-size: 19px; }
+.nav-item.active { color: var(--gold); }
+
+/* ---------- 弹窗 ---------- */
+#modal-mask {
+  position: fixed; inset: 0; background: rgba(0, 0, 0, 0.65);
+  display: flex; align-items: center; justify-content: center; z-index: 100;
+  padding: 32px;
+}
+#modal-box {
+  background: var(--bg-card); border: 1px solid var(--line);
+  border-radius: 14px; padding: 22px; width: 100%; max-width: 340px;
+}
+#modal-text { font-size: 15px; line-height: 1.9; margin-bottom: 20px; }
+.modal-btns { display: flex; gap: 12px; }
+.modal-btns .btn { margin: 0; padding: 11px; font-size: 15px; }
+
+/* ---------- 备注编辑弹层 ---------- */
+.note-editor { margin-top: 10px; }
+.note-editor textarea { min-height: 110px; }

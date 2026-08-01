@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0e0d0b">
+<title>算算 · 六爻占卜</title>
+<link rel="manifest" href="manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="算算">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- 主页 · 起卦 -->
+<section id="page-home" class="page">
+  <header class="page-header">
+    <h2>起卦</h2>
+    <div class="header-clock" id="home-clock"></div>
+  </header>
+  <div class="page-body">
+    <div class="mode-switch">
+      <button class="mode-pill active" data-mode="问道">问 道</button>
+      <button class="mode-pill" data-mode="易康">易 康</button>
+    </div>
+    <p class="mode-desc" id="mode-desc">问道模式：周易六爻解卦，兼融诗词国学、佛道经典</p>
+    <textarea id="matter-input" rows="3" placeholder="请默念所占之事，然后写在这里…&#10;例如：近期事业走向如何？"></textarea>
+    <button id="cast-btn" class="btn btn-primary btn-big">开始起卦</button>
+    <p class="cast-hint">心诚则灵 · 一事一占</p>
+    <div class="dev-footer">
+      <div class="dev-footer-line"></div>
+      <p>开发者邮箱：304610517@qq.com</p>
+    </div>
+  </div>
+</section>
+
+<!-- 结果页 -->
+<section id="page-result" class="page">
+  <header class="page-header">
+    <button class="btn-back" data-go="home">‹ 返回</button>
+    <h2>卦象</h2>
+    <span class="header-spacer"></span>
+  </header>
+  <div class="page-body" id="result-body"></div>
+</section>
+
+<!-- 历史页 -->
+<section id="page-history" class="page">
+  <header class="page-header">
+    <h2>历史记录</h2>
+    <span class="header-spacer"></span>
+  </header>
+  <div class="page-body" id="history-body"></div>
+</section>
+
+<!-- 历史详情页 -->
+<section id="page-history-detail" class="page">
+  <header class="page-header">
+    <button class="btn-back" data-go="history">‹ 返回</button>
+    <h2>卦象详情</h2>
+    <span class="header-spacer"></span>
+  </header>
+  <div class="page-body" id="history-detail-body"></div>
+</section>
+
+<!-- 备注页 -->
+<section id="page-notes" class="page">
+  <header class="page-header">
+    <h2>卦象备注</h2>
+    <span class="header-spacer"></span>
+  </header>
+  <div class="page-body" id="notes-body"></div>
+</section>
+
+<!-- 随喜页 -->
+<section id="page-donation" class="page">
+  <header class="page-header">
+    <h2>随喜支持</h2>
+    <span class="header-spacer"></span>
+  </header>
+  <div class="page-body donation-body">
+    <p class="donation-text">若此应用对您有所帮助<br>欢迎随喜支持，功德无量</p>
+    <div class="qr-frame">
+      <img id="donation-qr" src="https://mathlan.oss-cn-beijing.aliyuncs.com/liuyao.png" alt="收款码">
+      <div id="donation-qr-fallback" class="qr-fallback hidden">收款码加载失败<br>请检查网络后重试</div>
+    </div>
+    <p class="donation-thanks">感谢您的慷慨与支持</p>
+  </div>
+</section>
+
+<!-- 底部导航 -->
+<nav id="bottom-nav">
+  <button data-nav="home" class="nav-item"><span class="nav-icon">☰</span>起卦</button>
+  <button data-nav="history" class="nav-item"><span class="nav-icon">⏱</span>历史</button>
+  <button data-nav="notes" class="nav-item"><span class="nav-icon">✎</span>备注</button>
+  <button data-nav="donation" class="nav-item"><span class="nav-icon">♥</span>随喜</button>
+</nav>
+
+<!-- 弹窗 -->
+<div id="modal-mask" class="hidden">
+  <div id="modal-box">
+    <p id="modal-text"></p>
+    <div class="modal-btns">
+      <button id="modal-cancel" class="btn btn-ghost">取消</button>
+      <button id="modal-ok" class="btn btn-danger">确认</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/lunar.js"></script>
+<script src="js/core.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
