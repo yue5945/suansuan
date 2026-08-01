@@ -1,4 +1,4 @@
-// 算算 · 页面路由与渲染
+// 算算 · 页面路由与渲染（免登录版）
 (function () {
   "use strict";
 
@@ -7,7 +7,7 @@
 
   // ---------- 状态 ----------
   let currentMode = "问道";
-  let currentRecord = null;   // 本次起卦记录
+  let currentRecord = null;   // 当前查看的卦记录
   let clockTimer = null;
 
   const MODE_DESC = {
@@ -16,34 +16,22 @@
   };
 
   // ---------- 路由 ----------
-  const NAV_PAGES = ["home", "history", "notes", "settings"];
+  const NAV_PAGES = ["home", "history", "notes", "donation"];
 
   function showPage(name) {
     document.querySelectorAll(".page").forEach((p) => p.classList.remove("active"));
     const page = $("page-" + name);
     if (page) page.classList.add("active");
-    const nav = $("bottom-nav");
-    if (NAV_PAGES.includes(name)) {
-      nav.classList.remove("hidden");
-      document.querySelectorAll(".nav-item").forEach((b) =>
-        b.classList.toggle("active", b.dataset.nav === name));
-    } else {
-      nav.classList.add("hidden");
-    }
+    document.querySelectorAll(".nav-item").forEach((b) =>
+      b.classList.toggle("active", b.dataset.nav === name));
     if (name === "home") startClock(); else stopClock();
     if (name === "history") renderHistory();
     if (name === "notes") renderNotes();
-    if (name === "settings") renderSettings();
     if (location.hash !== "#/" + name) location.hash = "#/" + name;
     window.scrollTo(0, 0);
   }
 
-  function isLoggedIn() {
-    return sessionStorage.getItem("suansuan_session") === "1";
-  }
-
   function routeFromHash() {
-    if (!isLoggedIn()) { showPage("login"); return; }
     const name = (location.hash || "#/home").replace("#/", "") || "home";
     showPage(document.getElementById("page-" + name) ? name : "home");
   }
@@ -54,37 +42,6 @@
     $("modal-mask").classList.remove("hidden");
     $("modal-ok").onclick = () => { $("modal-mask").classList.add("hidden"); onOk(); };
     $("modal-cancel").onclick = () => $("modal-mask").classList.add("hidden");
-  }
-
-  function toast(el, msg, ok) {
-    el.textContent = msg;
-    el.className = "settings-hint " + (ok ? "ok" : "err");
-  }
-
-  // ---------- 登录 ----------
-  async function doLogin() {
-    const u = $("login-username").value;
-    const p = $("login-password").value;
-    const err = $("login-error");
-    err.textContent = "";
-    const btn = $("login-btn");
-    btn.disabled = true;
-    btn.textContent = "验证中…";
-    try {
-      const ok = await LYAuth.validateLogin(u, p, store);
-      if (ok) {
-        sessionStorage.setItem("suansuan_session", "1");
-        $("login-password").value = "";
-        showPage("home");
-      } else {
-        err.textContent = "用户名或密码错误，或授权已过期";
-      }
-    } catch (e) {
-      err.textContent = "验证失败：" + e.message;
-    } finally {
-      btn.disabled = false;
-      btn.textContent = "登 录";
-    }
   }
 
   // ---------- 主页时钟 ----------
@@ -120,18 +77,17 @@
     store.setJSON("history", history);
 
     currentRecord = record;
-    renderResult($("result-body"), record, { from: "home" });
+    renderResult($("result-body"), record);
     showPage("result");
   }
 
   // ---------- 排盘渲染 ----------
   function yaoFigure(yaoNum) {
     const yang = yaoNum === 7 || yaoNum === 9;
-    const moving = yaoNum === 6 || yaoNum === 9;
     const mark = yaoNum === 9 ? "○" : yaoNum === 6 ? "×" : "";
     const bars = yang
       ? '<div class="yao-bar"></div>'
-      : '<div class="yao-bar yin"></div><div class="yao-bar yin"></div>';
+      : '<div class="yao-bar"></div><div class="yao-bar"></div>';
     return `<div class="yao-fig">${bars}<span class="yao-mark">${mark}</span></div>`;
   }
 
@@ -186,7 +142,8 @@
       ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   }
 
-  function renderResult(container, record, opts) {
+  // 渲染卦象结果（结果页与历史详情页共用；按钮在容器内查找，避免跨页串扰）
+  function renderResult(container, record) {
     const notes = store.getJSON("user_notes", {});
     const benEntry = LYCore.lookupHexagram(record.ben_gua);
     const zhiEntry = LYCore.lookupHexagram(record.zhi_gua);
@@ -205,22 +162,30 @@
       html += `<div class="divi-meta">六爻安静，无之卦。本卦即为断卦依据。</div>`;
     }
     html += `<div class="result-actions">
-      <button class="btn btn-primary" id="ai-btn">AI 解卦</button>
-      <button class="btn btn-secondary" id="note-btn">写备注（${benEntry.name}）</button>
+      <button class="btn btn-primary ai-btn">AI 解卦</button>
+      <button class="btn btn-secondary note-btn">写备注（${benEntry.name}）</button>
     </div>
-    <div id="ai-area"></div>
-    <div id="note-area"></div>`;
+    <div class="ai-area"></div>
+    <div class="note-area"></div>`;
 
     container.innerHTML = html;
 
-    $("ai-btn").onclick = () => runAnalysis(record, benEntry, zhiEntry);
-    $("note-btn").onclick = () => showNoteEditor(benEntry.name);
+    // 已保存的 AI 解读直接展示
+    if (record.ai_analysis) {
+      container.querySelector(".ai-area").innerHTML =
+        `<div class="ai-result">${escapeHtml(record.ai_analysis)}</div>`;
+    }
+
+    container.querySelector(".ai-btn").onclick = () =>
+      runAnalysis(container, record, benEntry, zhiEntry);
+    container.querySelector(".note-btn").onclick = () =>
+      showNoteEditor(container, record, benEntry.name);
   }
 
   // ---------- AI 解卦 ----------
-  async function runAnalysis(record, benEntry, zhiEntry) {
-    const area = $("ai-area");
-    const btn = $("ai-btn");
+  async function runAnalysis(container, record, benEntry, zhiEntry) {
+    const area = container.querySelector(".ai-area");
+    const btn = container.querySelector(".ai-btn");
     btn.disabled = true;
     area.innerHTML = '<div class="ai-loading">正在请 AI 解卦，请稍候（约 10-60 秒）…</div>';
     try {
@@ -235,8 +200,18 @@
         timestamp: record.timestamp,
         apiKey,
       });
-      area.innerHTML = '<div class="ai-result"><span id="ai-text"></span><span class="ai-cursor">▌</span></div>';
-      typewriter($("ai-text"), text);
+      area.innerHTML = '<div class="ai-result"><span class="ai-text"></span><span class="ai-cursor">▌</span></div>';
+      typewriter(area.querySelector(".ai-text"), text, () => {
+        // 解读完成后写入历史记录，之后在历史详情中可直接查看
+        record.ai_analysis = text;
+        const h = store.getJSON("history", []);
+        const idx = h.findIndex((x) => x.timestamp === record.timestamp && x.matter === record.matter);
+        if (idx >= 0) {
+          h[idx].ai_analysis = text;
+          store.setJSON("history", h);
+        }
+        area.innerHTML = `<div class="ai-result">${escapeHtml(text)}</div>`;
+      });
     } catch (e) {
       area.innerHTML = `<div class="ai-result">⚠ ${escapeHtml(e.message)}</div>`;
     } finally {
@@ -244,44 +219,35 @@
     }
   }
 
-  function typewriter(el, text) {
+  function typewriter(el, text, onDone) {
     let i = 0;
     const step = () => {
       i = Math.min(i + 4, text.length);
       el.textContent = text.slice(0, i);
-      if (i < text.length) setTimeout(step, 18);
-      else {
-        const cursor = document.querySelector(".ai-cursor");
-        if (cursor) cursor.remove();
+      if (i < text.length) {
+        setTimeout(step, 18);
+      } else {
+        if (onDone) onDone();
       }
     };
     step();
   }
 
   // ---------- 备注 ----------
-  function showNoteEditor(hexName) {
-    const area = $("note-area");
+  function showNoteEditor(container, record, hexName) {
+    const area = container.querySelector(".note-area");
     const notes = store.getJSON("user_notes", {});
     area.innerHTML = `<div class="note-editor">
-      <textarea id="note-text" placeholder="写下对「${hexName}」的心得备注…">${escapeHtml(notes[hexName] || "")}</textarea>
-      <button class="btn btn-secondary" id="note-save-btn">保存备注</button>
+      <textarea class="note-text" placeholder="写下对「${hexName}」的心得备注…">${escapeHtml(notes[hexName] || "")}</textarea>
+      <button class="btn btn-secondary note-save-btn">保存备注</button>
     </div>`;
-    $("note-text").focus();
-    $("note-save-btn").onclick = () => {
-      const val = $("note-text").value.trim();
+    area.querySelector(".note-text").focus();
+    area.querySelector(".note-save-btn").onclick = () => {
+      const val = area.querySelector(".note-text").value.trim();
       const all = store.getJSON("user_notes", {});
       if (val) all[hexName] = val; else delete all[hexName];
       store.setJSON("user_notes", all);
-      area.innerHTML = '<p class="settings-hint ok">备注已保存</p>';
-      if (currentRecord) {
-        // 刷新排盘以显示备注
-        setTimeout(() => {
-          const body = $("result-body");
-          if (body.classList.contains("active") || $("page-result").classList.contains("active")) {
-            renderResult(body, currentRecord, {});
-          }
-        }, 300);
-      }
+      renderResult(container, record); // 重渲染以显示备注
     };
   }
 
@@ -295,13 +261,14 @@
     }
     body.innerHTML = history.map((r, i) => {
       const entry = LYCore.lookupHexagram(r.ben_gua);
+      const aiMark = r.ai_analysis ? ' · <span class="hi-ai">含AI解读</span>' : "";
       return `<div class="history-item">
         <div class="hi-top">
           <span class="hi-hex">${entry.name}</span>
           <span class="hi-time">${r.timestamp}</span>
         </div>
         <div class="hi-matter">${escapeHtml(r.matter || "")}</div>
-        <div class="hi-mode">${r.mode || "问道"} · ${r.day_gan || ""}${r.day_zhi || ""}日</div>
+        <div class="hi-mode">${r.mode || "问道"} · ${r.day_gan || ""}${r.day_zhi || ""}日${aiMark}</div>
         <div class="hi-actions">
           <button class="btn btn-secondary" data-detail="${i}">查看详情</button>
           <button class="btn btn-ghost" data-del="${i}">删除</button>
@@ -313,7 +280,7 @@
       b.onclick = () => {
         const r = store.getJSON("history", [])[Number(b.dataset.detail)];
         currentRecord = r;
-        renderResult($("history-detail-body"), r, {});
+        renderResult($("history-detail-body"), r);
         showPage("history-detail");
       });
     body.querySelectorAll("[data-del]").forEach((b) =>
@@ -350,11 +317,11 @@
         const notes2 = store.getJSON("user_notes", {});
         item.innerHTML = `<div class="ni-name">${name}</div>
           <div class="note-editor">
-            <textarea id="ne-${name}">${escapeHtml(notes2[name] || "")}</textarea>
-            <button class="btn btn-secondary" id="nes-${name}">保存</button>
+            <textarea class="note-text">${escapeHtml(notes2[name] || "")}</textarea>
+            <button class="btn btn-secondary note-save-btn">保存</button>
           </div>`;
-        $("nes-" + name).onclick = () => {
-          const val = $("ne-" + name).value.trim();
+        item.querySelector(".note-save-btn").onclick = () => {
+          const val = item.querySelector(".note-text").value.trim();
           const all = store.getJSON("user_notes", {});
           if (val) all[name] = val; else delete all[name];
           store.setJSON("user_notes", all);
@@ -370,60 +337,8 @@
       }));
   }
 
-  // ---------- 设置 ----------
-  function renderSettings() {
-    $("api-key-input").value = store.getJSON("api_key", LY_DATA.DEFAULT_API_KEY);
-    $("api-key-hint").textContent = "";
-    $("admin-lock").classList.remove("hidden");
-    $("admin-panel").classList.add("hidden");
-    $("admin-pwd-input").value = "";
-    $("admin-lock-hint").textContent = "";
-    $("clear-hint").textContent = "";
-  }
-
-  function renderAdminUsers() {
-    const users = LYAuth.getSpecialUsers(store);
-    const list = $("admin-user-list");
-    list.innerHTML = users.map((u) => {
-      const valid = LYAuth.checkDateValidity(u.expire_date);
-      return `<div class="admin-user-row">
-        <div class="au-info">
-          <div class="au-name">${escapeHtml(u.username)} / ${escapeHtml(u.password)}</div>
-          <div class="au-exp${valid ? "" : " expired"}">有效期至 ${u.expire_date}${valid ? "" : "（已过期）"}</div>
-        </div>
-        <button class="btn btn-secondary" data-editexp="${escapeHtml(u.username)}">改期</button>
-        <button class="btn btn-danger" data-deluser="${escapeHtml(u.username)}">删除</button>
-      </div>`;
-    }).join("");
-
-    list.querySelectorAll("[data-deluser]").forEach((b) =>
-      b.onclick = () => confirmModal(`确定删除授权用户「${b.dataset.deluser}」吗？`, () => {
-        LYAuth.deleteSpecialUser(store, b.dataset.deluser);
-        renderAdminUsers();
-      }));
-    list.querySelectorAll("[data-editexp]").forEach((b) =>
-      b.onclick = () => {
-        const uname = b.dataset.editexp;
-        const row = b.closest(".admin-user-row");
-        row.innerHTML = `<div class="au-info"><div class="au-name">${uname}</div>
-          <input id="exp-input-${uname}" type="text" placeholder="新有效期 如 2027/12/31" style="margin:6px 0"></div>
-          <button class="btn btn-secondary" id="exp-save-${uname}">保存</button>`;
-        $("exp-save-" + uname).onclick = () => {
-          try {
-            LYAuth.updateSpecialUser(store, uname, { expire_date: $("exp-input-" + uname).value.trim() });
-            renderAdminUsers();
-          } catch (e) {
-            toast($("admin-panel-hint"), e.message, false);
-          }
-        };
-      });
-  }
-
   // ---------- 事件绑定 ----------
   function bindEvents() {
-    $("login-btn").onclick = doLogin;
-    $("login-password").addEventListener("keydown", (e) => { if (e.key === "Enter") doLogin(); });
-
     document.querySelectorAll(".mode-pill").forEach((b) =>
       b.onclick = () => {
         document.querySelectorAll(".mode-pill").forEach((x) => x.classList.remove("active"));
@@ -439,74 +354,15 @@
     document.querySelectorAll(".btn-back").forEach((b) =>
       b.onclick = () => showPage(b.dataset.go));
 
-    $("goto-donation").onclick = () => showPage("donation");
     $("donation-qr").onerror = () => {
       $("donation-qr").classList.add("hidden");
       $("donation-qr-fallback").classList.remove("hidden");
     };
 
-    // 设置页
-    $("api-key-toggle").onclick = () => {
-      const inp = $("api-key-input");
-      inp.type = inp.type === "password" ? "text" : "password";
-      $("api-key-toggle").textContent = inp.type === "password" ? "显示" : "隐藏";
-    };
-    $("api-key-save").onclick = () => {
-      const v = $("api-key-input").value.trim();
-      if (!v) { toast($("api-key-hint"), "Key 不能为空", false); return; }
-      store.setJSON("api_key", v);
-      toast($("api-key-hint"), "API Key 已保存", true);
-    };
-
-    $("admin-unlock-btn").onclick = () => {
-      if (LYAuth.verifyAdminPassword(store, $("admin-pwd-input").value)) {
-        $("admin-lock").classList.add("hidden");
-        $("admin-panel").classList.remove("hidden");
-        $("admin-panel-hint").textContent = "";
-        renderAdminUsers();
-      } else {
-        toast($("admin-lock-hint"), "管理密码错误", false);
-      }
-    };
-    $("add-user-btn").onclick = () => {
-      try {
-        LYAuth.addSpecialUser(store, {
-          username: $("add-username").value.trim(),
-          password: $("add-password").value.trim(),
-          expire_date: $("add-expire").value.trim(),
-        });
-        $("add-username").value = $("add-password").value = $("add-expire").value = "";
-        toast($("admin-panel-hint"), "已添加授权用户", true);
-        renderAdminUsers();
-      } catch (e) {
-        toast($("admin-panel-hint"), e.message, false);
-      }
-    };
-    $("change-admin-pwd-btn").onclick = () => {
-      try {
-        LYAuth.setAdminPassword(store, $("new-admin-pwd").value.trim());
-        $("new-admin-pwd").value = "";
-        toast($("admin-panel-hint"), "管理密码已修改", true);
-      } catch (e) {
-        toast($("admin-panel-hint"), e.message, false);
-      }
-    };
-
-    $("clear-history-btn").onclick = () =>
-      confirmModal("确定清空全部历史记录吗？此操作不可恢复。", () => {
-        store.setJSON("history", []);
-        toast($("clear-hint"), "历史记录已清空", true);
-      });
-
-    $("logout-btn").onclick = () => {
-      sessionStorage.removeItem("suansuan_session");
-      showPage("login");
-    };
-
     window.addEventListener("hashchange", routeFromHash);
   }
 
-  // ---------- 启动 ----------
+  // ---------- 启动（免登录，直接进入） ----------
   bindEvents();
   routeFromHash();
 })();
