@@ -295,7 +295,7 @@ var LY_DATA = {
    "binary": "100101",
    "judgment": "亨小利有攸往",
    "palace": "100",
-   "shi_yao": 4,
+   "shi_yao": 1,
    "type": "一世",
    "xinxi": "",
    "lines": {
@@ -839,7 +839,7 @@ var LY_DATA = {
    "binary": "001000",
    "judgment": "利建侯行师",
    "palace": "001",
-   "shi_yao": 6,
+   "shi_yao": 1,
    "type": "一世",
    "xinxi": "",
    "lines": {
