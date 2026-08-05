@@ -68,12 +68,12 @@
 
   // ---- 干支 / 农历 ----
 
-  // 基准日：2025-01-01 为庚午日（序号 36）
+  // 基准日：2025-01-01 为庚午日（六十甲子序号 6，已与真实万年历核对）
   function getGanZhi(date) {
     const base = Date.UTC(2025, 0, 1);
     const target = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
     const delta = Math.round((target - base) / 86400000);
-    const idx = (((delta + 36) % 60) + 60) % 60;
+    const idx = (((delta + 6) % 60) + 60) % 60;
     return [TIAN_GAN[idx % 10], DI_ZHI[idx % 12]];
   }
 
